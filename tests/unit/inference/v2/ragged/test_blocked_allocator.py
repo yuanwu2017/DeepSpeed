@@ -12,6 +12,7 @@ import torch
 from deepspeed.inference.v2.ragged.blocked_allocator import BlockedAllocator
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('bad_size', [0, -1])
 def test_bad_initialization(bad_size: int) -> None:
@@ -19,6 +20,7 @@ def test_bad_initialization(bad_size: int) -> None:
         BlockedAllocator(bad_size)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_allocation() -> None:
 
@@ -47,6 +49,7 @@ def test_allocation() -> None:
     assert unique_vals.numel() == all_vals.numel()
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_too_large_allocation():
     allocator = BlockedAllocator(16)
@@ -55,6 +58,7 @@ def test_too_large_allocation():
         allocator.allocate(17)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_deallocation() -> None:
     allocator = BlockedAllocator(16)
@@ -87,6 +91,7 @@ def test_deallocation() -> None:
         allocator.free(c2)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('index', [-1, 2])
 def test_invalid_dealloc_indices(index: int):
@@ -96,6 +101,7 @@ def test_invalid_dealloc_indices(index: int):
         allocator.free(torch.tensor([index]))
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('index', [-1, 2])
 def test_invalid_alloc_indices(index: int):
@@ -114,6 +120,7 @@ def test_invalid_alloc_indices(index: int):
     assert allocator.free_blocks == 1
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('test_iters', [8192])
 def test_long_running_allocation(test_iters: int) -> None:

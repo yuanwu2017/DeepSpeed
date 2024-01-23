@@ -86,6 +86,7 @@ def _blas_linear_helper(tokens: int,
     assert allclose(ds_output, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("tokens, in_channels, out_channels", [(1, 4608, 1728), (37, 8192, 4096), (1280, 3072, 6144)])
 def test_blas_linear_shapes(tokens: int, in_channels: int, out_channels: int) -> None:
@@ -103,6 +104,7 @@ all_acts = [
 ]
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("act_fn", all_acts)
 @pytest.mark.parametrize("use_bias", [True, False])

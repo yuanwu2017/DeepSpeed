@@ -69,6 +69,7 @@ def rotary_pos_embs(q: torch.Tensor, k: torch.Tensor, seq_descs: List[DSSequence
     return q_out, k_out, freqs
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, history_size", [(1, 0), (17, 0), (33, 15), (1, 63)])
 @pytest.mark.parametrize("trained_emb", [False, True])
@@ -113,6 +114,7 @@ def test_single_sequence_single_block(n_tokens: int, history_size: int, trained_
     validate_kv_cache(kv_cache, k, v, seq_descs, batch, exact=False)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, history_size", [(128, 0), (177, 0), (169, 8), (117, 88)])
 @pytest.mark.parametrize("trained_emb", [False, True])
@@ -157,6 +159,7 @@ def test_single_sequence_multiple_blocks(n_tokens: int, history_size: int, train
     validate_kv_cache(kv_cache, k, v, seq_descs, batch, exact=False)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("trained_emb", [False, True])
 def test_multi_sequences(trained_emb: bool) -> None:

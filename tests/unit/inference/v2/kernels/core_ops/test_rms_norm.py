@@ -63,6 +63,7 @@ def _rms_norm_testing_helper(rows: int, channels: int, do_residual: bool, dtype:
         assert allclose(ds_out, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("dtype", get_dtypes())
 @pytest.mark.parametrize("do_residual", [True, False])
@@ -70,6 +71,7 @@ def test_rms_dtypes(dtype: DtypeEnum, do_residual: bool) -> None:
     _rms_norm_testing_helper(883, 1024, do_residual, DtypeEnum(dtype))
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("rows, cols", [(1, 4096), (37, 2048), (112, 14432), (1024, 6144)])
 @pytest.mark.parametrize("do_residual", [True, False])

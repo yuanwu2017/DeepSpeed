@@ -9,7 +9,7 @@ from unit.common import DistributedTest
 
 from transformers import VisionEncoderDecoderModel
 from transformers.deepspeed import HfDeepSpeedConfig
-
+import pytest
 import deepspeed
 
 
@@ -18,7 +18,8 @@ class TestNestingInit(DistributedTest):
 
     def test_nesting_init(self):
         ds_config = dict(train_batch_size=1, zero_optimization=dict(stage=3))
-
+        if bool(pytest.use_hpu) == True:
+            ds_config['communication_data_type'] = 'bfp16'
         with deepspeed.zero.Init(config_dict_or_path=ds_config):
             with deepspeed.zero.Init(config_dict_or_path=ds_config):
                 model = torch.nn.Linear(4, 4)
@@ -34,6 +35,8 @@ class TestShutdownInNestingInit(DistributedTest):
 
     def test_shutdown_in_nesting_init(self):
         ds_config = dict(train_batch_size=1, zero_optimization=dict(stage=3))
+        if bool(pytest.use_hpu) == True:
+            ds_config['communication_data_type'] = 'bfp16'
 
         with deepspeed.zero.Init(config_dict_or_path=ds_config):
             with deepspeed.zero.Init(config_dict_or_path=ds_config):

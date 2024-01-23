@@ -46,6 +46,7 @@ def make_params(model_dim: int, ffn_multiplier: int, n_experts: int, gated: bool
     return (mlp_1_w, mlp_1_b, mlp_2_w, mlp_2_b)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("model_dim, ffn_multiplier, n_shards", [(1024, 4, 1), (1024, 4, 8), (1024, 4, 6)])
 @pytest.mark.parametrize("n_experts", [1, 16])
@@ -82,6 +83,7 @@ def test_even_ffn_sharding(model_dim: int, ffn_multiplier: int, n_shards: int, n
     assert mapped_neurons == total_ffn_dim
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("model_dim, ffn_multiplier, n_shards", [(1024, 4, 1), (1024, 4, 8), (1024, 4, 6)])
 @pytest.mark.parametrize("n_experts", [1, 16])

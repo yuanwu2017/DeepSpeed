@@ -32,6 +32,8 @@ def test_attention(BATCH, H, N_CTX, D_HEAD, causal, use_flash, dtype=torch.float
 
     minus_inf = -65504.0
 
+    if bool(pytest.use_hpu) == True:
+        pytest.skip("HPU is not supported triton ops.")
     # skip autotune in testing
     from deepspeed.ops.transformer.inference.triton.matmul_ext import fp16_matmul
     fp16_matmul.skip_autotune()

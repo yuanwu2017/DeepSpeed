@@ -71,18 +71,21 @@ def _pre_ln_test_helper(n_tokens: int, n_channels: int, dtype: torch.dtype, res_
     assert allclose(ds_output, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("tokens, channels", [(1, 2048), (37, 8192), (1280, 768), (2048, 5120)])
 def test_token_channels(tokens: int, channels: int) -> None:
     _pre_ln_test_helper(tokens, channels, torch.float16)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("dtype", get_dtypes(include_float=False))
 def test_dtype(dtype: torch.dtype) -> None:
     _pre_ln_test_helper(733, 2560, dtype)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_no_res_add():
     _pre_ln_test_helper(733, 2560, torch.float16, res_add=False)

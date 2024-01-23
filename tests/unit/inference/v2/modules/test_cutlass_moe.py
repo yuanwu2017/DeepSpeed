@@ -150,6 +150,7 @@ def _cutlass_moe_testing_helper(tokens: int,
     get_accelerator().synchronize()
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("experts", [2, 32, 64])
 def test_expert_variance(experts: int) -> None:
@@ -162,6 +163,7 @@ def test_expert_variance(experts: int) -> None:
                                 use_bias=True)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_successive_inputs():
     """
@@ -178,6 +180,7 @@ def test_successive_inputs():
                                 iters=10)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("dtype", get_dtypes(include_float=False))
 def test_dtypes(dtype: torch.dtype) -> None:
@@ -190,6 +193,7 @@ def test_dtypes(dtype: torch.dtype) -> None:
                                 use_bias=True)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("activation_type", [ActivationType.GELU, ActivationType.RELU, ActivationType.SILU])
 def test_activation_types(activation_type: ActivationType) -> None:
@@ -202,6 +206,7 @@ def test_activation_types(activation_type: ActivationType) -> None:
                                 use_bias=True)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("in_channels, out_channels", [(4096, 2048), (2048, 8192), (6144, 3072)])
 def test_in_out_channels(in_channels: int, out_channels: int) -> None:

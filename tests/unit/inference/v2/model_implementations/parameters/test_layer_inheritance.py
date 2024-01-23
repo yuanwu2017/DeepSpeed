@@ -28,6 +28,7 @@ class ChildLayer(ParentLayer):
     param_2: SimpleParam
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_layer_inheritance():
     inference_model = DummyInferenceModel()

@@ -103,6 +103,7 @@ def _ragged_embed_test_helper(sequence_config: List[Tuple[int, int]],
     assert allclose(output[:batch.current_tokens], baseline_output[:batch.current_tokens])
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('token_dtype', [torch.int32, torch.int64])
 @pytest.mark.parametrize('embed_dtype', get_dtypes())
@@ -117,6 +118,7 @@ def test_dtype_permutations(token_dtype: torch.dtype, embed_dtype: torch.dtype) 
     _ragged_embed_test_helper([(256, 0)], embed_dtype, token_dtype, embed_dim, vocab_size)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('vocab_size, embed_dim', [(1024, 1024), (32000, 5120), (50304, 6144)])
 def test_problem_size_permutations(vocab_size: int, embed_dim: int) -> None:
@@ -127,6 +129,7 @@ def test_problem_size_permutations(vocab_size: int, embed_dim: int) -> None:
     _ragged_embed_test_helper([(256, 0)], torch.float16, torch.int32, embed_dim, vocab_size)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('seq_lens', [[128, 64, 192, 32], [57, 112, 63, 89, 1, 1, 1, 1]])
 @pytest.mark.parametrize('do_padding', [True, False])
@@ -145,6 +148,7 @@ def test_complex_sequences(seq_lens: List[int], do_padding: bool) -> None:
                               do_padding=do_padding)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("seq_lens", [[(256, 0)], [(256, 0),
                                                    (128, 0)], [(256, 0), (128, 0),
@@ -159,6 +163,7 @@ def test_positional_embedding(seq_lens: List[Tuple[int, int]]) -> None:
     _ragged_embed_test_helper(seq_lens, torch.float16, torch.int32, embed_dim, vocab_size, pos_embed_size=2048)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_positional_embedding_offset() -> None:
     """

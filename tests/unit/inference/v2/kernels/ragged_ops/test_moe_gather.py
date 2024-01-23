@@ -62,6 +62,7 @@ def build_inputs(n_tokens, n_experts, do_padding):
     return batch, moe_input, scores, mapped_slots, expert_counts
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, n_experts", [(13, 64), (278, 64), (1977, 64)])
 @pytest.mark.parametrize("do_padding", [True, False])

@@ -14,6 +14,8 @@ def skip_on_arch(min_arch=7):
     if get_accelerator().device_name() == 'cuda':
         if torch.cuda.get_device_capability()[0] < min_arch:  #ignore-cuda
             pytest.skip(f"needs higher compute capability than {min_arch}")
+    elif get_accelerator().device_name() == 'hpu':
+        return
     else:
         assert is_current_accelerator_supported()
         return
@@ -32,6 +34,8 @@ def skip_on_cuda(valid_cuda):
 
 
 def bf16_required_version_check(accelerator_check=True):
+    if bool(pytest.use_hpu) == True:
+        return True
     split_version = lambda x: map(int, x.split('.')[:2])
     TORCH_MAJOR, TORCH_MINOR = split_version(torch_info['version'])
     NCCL_MAJOR, NCCL_MINOR = split_version(torch_info['nccl_version'])

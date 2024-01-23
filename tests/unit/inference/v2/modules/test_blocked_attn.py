@@ -127,6 +127,7 @@ def _blocked_flash_testing_helper(head_size: int,
     get_accelerator().synchronize()
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens", [2, 33, 65, 128, 256, 2037])
 def test_single_prompt(n_tokens: int) -> None:
@@ -138,6 +139,7 @@ def test_single_prompt(n_tokens: int) -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, seq_params)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("prompt_lengths", [(128, 128), (192, 38), (514, 713), (83, 312, 610)])
 def test_multiple_prompts(prompt_lengths: Tuple[int, int]) -> None:
@@ -152,6 +154,7 @@ def test_multiple_prompts(prompt_lengths: Tuple[int, int]) -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, seq_params)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("seq_params", [(1, 34), (43, 40), (1, 144), (64, 128), (332, 628)])
 def test_continuation(seq_params: Tuple[int, int]) -> None:
@@ -165,6 +168,7 @@ def test_continuation(seq_params: Tuple[int, int]) -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, [seq_params])
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("head_size", [64, 128])
 def test_head_size(head_size: int) -> None:
@@ -175,6 +179,7 @@ def test_head_size(head_size: int) -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, seq_params)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("head_config", [(32, 8), (64, 16), (40, 8)])
 def test_gqa(head_config: Tuple[int, int]) -> None:
@@ -187,6 +192,7 @@ def test_gqa(head_config: Tuple[int, int]) -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, seq_params)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_fully_composed() -> None:
     head_size = 64
@@ -198,6 +204,7 @@ def test_fully_composed() -> None:
     _blocked_flash_testing_helper(head_size, n_heads_q, n_heads_kv, seq_params)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("trained_freqs", [True, False])
 def test_rotary_emb(trained_freqs: bool) -> None:

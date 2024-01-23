@@ -38,6 +38,7 @@ def reference_geglu_implementation(input: torch.Tensor,
     return (act_act * act_linear).to(dtype)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("shape", [(1372, 16384), (2, 743, 22016)])
 @pytest.mark.parametrize("dtype", get_dtypes())
@@ -60,6 +61,7 @@ def test_dtypes(shape: Iterable[int], dtype: torch.dtype) -> None:
     assert allclose(output_tensor, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("act_fn", [ActivationType.GEGLU, ActivationType.ReGLU, ActivationType.SiGLU])
 def test_act_fn(act_fn: ActivationType) -> None:
@@ -77,6 +79,7 @@ def test_act_fn(act_fn: ActivationType) -> None:
     assert allclose(output_tensor, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_act_with_bias():
     input_tensor = torch.randn(832, 4096, dtype=torch.float16, device=get_accelerator().current_device())
@@ -95,6 +98,7 @@ def test_act_with_bias():
     assert allclose(output_tensor, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_max_channels():
     input_tensor = torch.randn(832, 48152, dtype=torch.float16, device=get_accelerator().current_device())
@@ -109,24 +113,28 @@ def test_max_channels():
     assert allclose(output_tensor, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_bad_dtype() -> None:
     with pytest.raises(ValueError):
         CUDAGatedActivation(128, torch.int8, ActivationType.GEGLU)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_bad_act_fn() -> None:
     with pytest.raises(ValueError):
         CUDAGatedActivation(128, torch.float16, ActivationType.RELU)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_bad_alignment() -> None:
     with pytest.raises(ValueError):
         CUDAGatedActivation(127, torch.float16, ActivationType.GEGLU)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_too_many_channels() -> None:
     with pytest.raises(ValueError):

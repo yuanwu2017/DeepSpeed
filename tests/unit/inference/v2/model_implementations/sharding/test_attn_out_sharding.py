@@ -23,6 +23,7 @@ def fill_with_head_ids(head_size: int, n_heads: int) -> torch.Tensor:
     return head_ids
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("n_heads, n_shards", [(1, 1), (8, 4), (32, 8)])
 def test_mha_even_sharding(n_heads: int, n_shards: int):
@@ -51,6 +52,7 @@ def test_mha_even_sharding(n_heads: int, n_shards: int):
             assert torch.all(head == i + shard_rank * n_local_heads)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("n_heads, n_shards", [(3, 2), (20, 8)])
 def test_mha_unbalanced_sharding(n_heads: int, n_shards: int):
@@ -89,6 +91,7 @@ def test_mha_unbalanced_sharding(n_heads: int, n_shards: int):
     assert len(seen_heads) == n_heads
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("n_heads_q, n_heads_kv, n_shards", [(20, 4, 8)])
 def test_gqa_uneven_sharding(n_heads_q: int, n_heads_kv: int, n_shards: int):

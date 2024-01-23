@@ -37,6 +37,7 @@ def validate_inferred_shape(shard: torch.Tensor, head_size: int, n_local_q_heads
     assert shard.shape[0] == inferred_leading_dim
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads,n_shards", [(1, 1), (32, 1), (32, 8)])
@@ -64,6 +65,7 @@ def test_even_mha_sharding(head_size: int, n_heads: int, n_shards: int):
             assert torch.all(heads[i + heads_per_shard * 2] == i + shard_rank * heads_per_shard)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads, n_shards", [(3, 2), (20, 8)])
@@ -109,6 +111,7 @@ def test_unbalanced_mha_sharding(head_size: int, n_heads: int, n_shards: int):
     assert len(seen_heads) == n_heads
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads_q, n_heads_kv, n_shards", [(4, 2, 1), (8, 2, 1), (64, 16, 8)])
@@ -143,6 +146,7 @@ def test_gqa_even_sharding(head_size: int, n_heads_q: int, n_heads_kv: int, n_sh
                              shard_rank * n_kv_heads_in_shard)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads_q, n_heads_kv, n_shards", [(4, 2, 4), (20, 4, 8)])
@@ -190,6 +194,7 @@ def test_gqa_uneven_sharding(head_size: int, n_heads_q: int, n_heads_kv: int, n_
     assert len(seen_heads) == n_heads_q
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads, n_shards", [(6, 8)])
@@ -206,6 +211,7 @@ def test_unsupported_mha_configs(head_size: int, n_heads: int, n_shards: int):
             shard_qkv_param(param, shard_rank, n_shards, head_size, n_heads, n_heads)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize("head_size", [64])
 @pytest.mark.parametrize("n_heads_q, n_heads_kv, n_shards", [(5, 2, 1), (40, 10, 8), (30, 5, 8)])
@@ -225,6 +231,7 @@ def test_unsupported_gqa_configs(head_size: int, n_heads_q: int, n_heads_kv: int
             shard_qkv_param(param, shard_rank, n_shards, head_size, n_heads_q, n_heads_kv)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_mha_input_shape_error():
 
@@ -237,6 +244,7 @@ def test_mha_input_shape_error():
         shard_qkv_param(param, 0, 1, 64)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_gqa_input_shape_error():
 

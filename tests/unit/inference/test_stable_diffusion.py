@@ -20,13 +20,21 @@ class TestStableDiffusion(DistributedTest):
     def test(self):
         from diffusers import DiffusionPipeline
         from image_similarity_measures.quality_metrics import rmse
-        generator = torch.Generator(device=get_accelerator().current_device())
+        if bool(pytest.use_hpu) == True:
+            generator = torch.Generator()
+        else:
+            generator = torch.Generator(device=get_accelerator().current_device())
         seed = 0xABEDABE7
         generator.manual_seed(seed)
         prompt = "a dog on a rocket"
         model = "prompthero/midjourney-v4-diffusion"
         local_rank = int(os.getenv("LOCAL_RANK", "0"))
         device = torch.device(f"cuda:{local_rank}")
+        dtype = torch.half
+        if bool(pytest.use_hpu) == True:
+            device = torch.device(f"hpu:{local_rank}")
+            if os.getenv("REPLACE_FP16", default=None):
+                dtype = torch.bfloat16
 
         pipe = DiffusionPipeline.from_pretrained(model, torch_dtype=torch.half)
         pipe = pipe.to(device)

@@ -13,6 +13,7 @@ Q_BLOCK_SIZE = 128
 KV_BLOCK_SIZE = 128
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('seq_params', [(1, 0, 0), (1, 228, 0), (383, 0, 0), (1, 494, 0)])
 def test_single_sequence(seq_params) -> None:

@@ -32,6 +32,7 @@ class MixedMultiParameterLayer(LayerContainer):
     param_2: ListParam
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_multi_parameter_layer():
     inference_model = DummyInferenceModel()
@@ -52,6 +53,7 @@ def test_multi_parameter_layer():
     assert isinstance(multi_param_layer.param_2, InferenceParameter)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_mixed_multi_parameter_layer():
     inference_model = DummyInferenceModel()

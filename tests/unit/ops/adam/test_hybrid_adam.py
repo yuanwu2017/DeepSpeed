@@ -58,7 +58,11 @@ class TestHybridAdam(DistributedTest):
         cuda_param = torch.nn.Parameter(cuda_data.to(get_accelerator().device_name()))
 
         cpu_optimizer = DeepSpeedCPUAdam([cpu_param])
-        cuda_optimizer = FusedAdam([cuda_param])
+        if pytest.use_hpu:
+            from habana_frameworks.torch.hpex.optimizers import FusedAdamW
+            cuda_optimizer = FusedAdamW([cuda_param])
+        else:
+            cuda_optimizer = FusedAdam([cuda_param])
 
         ref_grad = torch.randn(model_size).to(dtype)
         cpu_grad, cuda_grad = ref_grad.clone().detach().chunk(2)

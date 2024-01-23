@@ -11,6 +11,7 @@ from deepspeed.inference.v2.kernels.ragged_ops import LinearBlockedKVCopy
 from .ragged_testing_utils import build_batch_and_manager, validate_kv_cache
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, history_size", [(1, 0), (17, 0), (33, 8), (63, 1)])
 def test_single_sequence_single_block(n_tokens: int, history_size: int):
@@ -44,6 +45,7 @@ def test_single_sequence_single_block(n_tokens: int, history_size: int):
     validate_kv_cache(kv_cache, k, v, seq_descs, batch)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, history_size", [(128, 0), (177, 0), (169, 8), (117, 88)])
 def test_single_sequence_multiple_blocks(n_tokens: int, history_size: int):
@@ -77,6 +79,7 @@ def test_single_sequence_multiple_blocks(n_tokens: int, history_size: int):
     validate_kv_cache(kv_cache, k, v, seq_descs, batch)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_multi_sequence() -> None:
     head_size = 64

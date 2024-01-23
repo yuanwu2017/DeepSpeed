@@ -27,6 +27,7 @@ def baseline_implementation(hidden_states: torch.Tensor, seq_lens: List[int]) ->
     return output
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('dtype', get_dtypes())
 def test_supported_dtypes(dtype: torch.dtype) -> None:
@@ -49,6 +50,7 @@ def test_supported_dtypes(dtype: torch.dtype) -> None:
     assert allclose(output, reference_result)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('seq_lens', [[128, 64, 192, 32], [57, 112, 63, 89, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1],
                                       [63, 27, 74, 83, 32, 17, 1, 1, 1, 1, 1]])
@@ -73,6 +75,7 @@ def test_multiple_sequences(seq_lens: List[int]) -> None:
     assert allclose(output, reference_result)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("model_dim", [1024, 6144, 6784])
 def test_problem_size_permutations(model_dim: int) -> None:

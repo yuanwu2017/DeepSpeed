@@ -25,6 +25,7 @@ def reference_implementation(residual: torch.Tensor, hidden_states: torch.Tensor
                                           eps=epsilon).to(hidden_states.dtype)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("tokens, channels", [(1, 2048), (37, 8192), (1280, 768), (2048, 5120)])
 @pytest.mark.parametrize("dtype", get_dtypes())

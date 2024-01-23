@@ -63,6 +63,7 @@ def _bias_activation_test_helper(tokens: int,
     assert allclose(ds_tensor, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("tokens, channels", [(1, 4096), (37, 2048), (112, 14432), (1024, 6144)])
 @pytest.mark.parametrize("dtype", get_dtypes(include_float=False))
@@ -76,6 +77,7 @@ def test_token_channels_permutations(tokens: int, channels: int, dtype: torch.dt
     _bias_activation_test_helper(tokens, channels, act_fn, dtype)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("act_fn",
                          [ActivationType.RELU, ActivationType.GELU, ActivationType.SILU, ActivationType.IDENTITY])
@@ -89,6 +91,7 @@ def test_act_fns(act_fn: ActivationType) -> None:
     _bias_activation_test_helper(tokens, channels, act_fn, dtype)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_no_bias() -> None:
     """

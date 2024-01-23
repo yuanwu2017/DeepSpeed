@@ -3,6 +3,7 @@
 
 # DeepSpeed Team
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -35,7 +36,8 @@ class TestCheckpointSharedWeights(DistributedTest):
         }
         model = ModelWithSharedWeights()
         optimizer = torch.optim.Adam(model.parameters())
-
+        if bool(pytest.use_hpu) == True:
+            config["communication_data_type"] = 'bfp16'
         deepspeed_engine, _, _, _ = deepspeed.initialize(
             config=config,
             model=model,

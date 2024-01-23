@@ -48,6 +48,7 @@ class NonTransformerContainer(LayerContainer):
     param_3: SimpleParam
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_contiguify_roundtrip():
     """

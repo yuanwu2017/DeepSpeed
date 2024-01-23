@@ -33,6 +33,7 @@ problem_shapes = [
 ]
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("fp_dtype", [torch.float16, torch.bfloat16])
 @pytest.mark.parametrize("problem_shape", problem_shapes)
@@ -51,6 +52,7 @@ def test_blas_linear(fp_dtype: torch.dtype, problem_shape: Tuple[int, int, int, 
     assert allclose(ds_output, ref_output)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("fp_dtype", [torch.float16, torch.bfloat16])
 @pytest.mark.parametrize("problem_shape", problem_shapes)

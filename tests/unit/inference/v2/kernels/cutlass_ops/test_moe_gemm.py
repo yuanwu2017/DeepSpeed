@@ -20,6 +20,7 @@ PYTORCH_ACT_FN_MAP = {
 }
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("n_tokens, in_neurons, out_neurons", SINGLE_EXPERT_CASES)
 def test_single_expert(n_tokens: int, in_neurons: int, out_neurons: int) -> None:
@@ -86,6 +87,7 @@ def moe_test_helper(in_neurons: int, out_neurons: int, n_experts: int, max_token
     get_accelerator().synchronize()
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("max_tokens_per_expert", [1, 4, 16, 64, 128])
 def test_multi_expert(max_tokens_per_expert: int) -> None:
@@ -95,6 +97,7 @@ def test_multi_expert(max_tokens_per_expert: int) -> None:
     moe_test_helper(5120, 2048, 64, max_tokens_per_expert, ActivationType.IDENTITY, DtypeEnum.fp16)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("act_fn", [ActivationType.GELU, ActivationType.SILU, ActivationType.RELU])
 def test_act_fns(act_fn: ActivationType) -> None:
@@ -104,6 +107,7 @@ def test_act_fns(act_fn: ActivationType) -> None:
     moe_test_helper(5120, 2048, 64, 32, act_fn, DtypeEnum.fp16)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize("dtype", [DtypeEnum.fp16, DtypeEnum.bf16])
 def test_dtypes(dtype: DtypeEnum) -> None:

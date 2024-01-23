@@ -42,6 +42,7 @@ def _test_single_mapping_helper(n_tokens: int,
     assert allclose(scores, F.softmax(logits.float(), dim=1)[:, assigned_expert])
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('n_tokens, n_experts', [(1, 16), (17, 16), (32, 128), (89, 128), (433, 128)])
 def test_single_mapping_gating(n_tokens: int, n_experts: int) -> None:
@@ -53,6 +54,7 @@ def test_single_mapping_gating(n_tokens: int, n_experts: int) -> None:
     _test_single_mapping_helper(n_tokens, n_experts, assigned_expert)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_negative_logits():
     """
@@ -62,6 +64,7 @@ def test_negative_logits():
     _test_single_mapping_helper(128, 32, 13, logit_fill=-2.0, match_fill=-1.0)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 def test_determinism():
     """
@@ -97,6 +100,7 @@ def test_determinism():
         assert allclose(scores, F.softmax(logits.float(), dim=1)[:, 19])
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2_ops
 @pytest.mark.parametrize('n_tokens, n_experts', [(1, 16), (17, 16), (32, 128), (89, 128), (433, 2)])
 def test_score_accuracy(n_tokens: int, n_experts: int) -> None:

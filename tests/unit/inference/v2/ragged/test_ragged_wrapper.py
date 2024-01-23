@@ -16,6 +16,7 @@ from deepspeed.inference.v2.ragged import (
 )
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('max_ragged_sequence_count, max_ragged_batch_size', [(128, 512), (128, 1024)])
 def test_wrapper_initialization(max_ragged_sequence_count: int, max_ragged_batch_size: int) -> None:
@@ -29,6 +30,7 @@ def test_wrapper_initialization(max_ragged_sequence_count: int, max_ragged_batch
     assert batch.current_sequences == 0
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('seq_len', [1, 37, 128, 512])
 def test_single_sequence_batch(seq_len: int) -> None:
@@ -63,6 +65,7 @@ def test_single_sequence_batch(seq_len: int) -> None:
     assert batch.current_sequences == 0
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 @pytest.mark.parametrize('seq_lens', [[128, 128], [1, 32, 243], [64, 1, 1, 1, 1, 393, 27, 2]])
 def test_multi_sequence_batch(seq_lens: List[int]) -> None:

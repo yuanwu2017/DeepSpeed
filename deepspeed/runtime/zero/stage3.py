@@ -15,7 +15,7 @@ from deepspeed.runtime import ZeROOptimizer
 from deepspeed.utils import logger
 from deepspeed.runtime.fp16.loss_scaler import CreateLossScaler
 from deepspeed.runtime.comm.coalesced_collectives import reduce_scatter_coalesced, all_to_all_quant_reduce
-from deepspeed.runtime.utils import inf, get_global_norm, is_model_parallel_parameter, get_only_unique_item
+from deepspeed.runtime.utils import inf, is_model_parallel_parameter, get_only_unique_item
 from deepspeed.runtime.zero.partition_parameters import *
 from deepspeed.runtime.zero.config import ZeroStageEnum
 from deepspeed.runtime.zero.offload_config import OffloadDeviceEnum
@@ -323,7 +323,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
         self.param_reduce_events: Deque[get_accelerator().Event] = collections.deque()
         # TODO. make this configurable via JSON
-        self.max_param_reduce_events: int = 2
+        self.max_param_reduce_events: int = 2 if get_accelerator().device_name() != "hpu" else -1
 
         self.param_dict = {}
 
@@ -541,6 +541,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             offset += tensor_numel
 
         gc.collect()
+        #TODO SW-107191: support empty_cache() in hpu
         get_accelerator().empty_cache()
 
         # copy tensors (now flattened and contiguous) back to GPU
@@ -1075,7 +1076,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.__reduce_and_partition_ipg_grads()
         self.report_ipg_memory_usage(f"In ipg_epilogue after reduce_ipg_grads", 0)
 
-        if not get_accelerator().is_synchronized_device():
+        if not get_accelerator().is_synchronized_device() and get_accelerator().device_name() != "hpu":
             self.reduce_and_partition_stream.synchronize()
 
         #in case of cpu offload, averaged gradients are already in fp32_partitioned_groups_flat.grad
@@ -1189,7 +1190,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
         while self.param_reduce_events and self.param_reduce_events[0].query():
             self.param_reduce_events.popleft()
-        if len(self.param_reduce_events) > self.max_param_reduce_events:
+        if len(self.param_reduce_events) > self.max_param_reduce_events > -1:
             self.param_reduce_events.popleft().synchronize()
 
         with get_accelerator().stream(self.reduce_and_partition_stream):
@@ -1207,15 +1208,14 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
             self.params_in_ipg_bucket.clear()
 
-            if not get_accelerator().is_synchronized_device():
+            if not get_accelerator().is_synchronized_device() and self.max_param_reduce_events > -1:
                 event = get_accelerator().Event()
                 event.record()
                 self.param_reduce_events.append(event)
 
     @instrument_w_nvtx
     def __avg_scatter_contiguous_grads(self, buffer_to_reduce: Tensor) -> List[Tensor]:
-        dtype = buffer_to_reduce.dtype
-        if self.communication_data_type == self.dtype:
+        if self.communication_data_type != self.dtype:
             buffer_to_reduce = buffer_to_reduce.to(self.communication_data_type)
         if self.postscale_gradients and self.gradient_predivide_factor != 1.0:
             buffer_to_reduce = buffer_to_reduce.div_(self.gradient_predivide_factor)
@@ -1324,7 +1324,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 param_id = self.get_param_id(p)
                 if param_id in self.norm_for_param_grads.keys():
                     param_norm = self.norm_for_param_grads[param_id]
-                    total_norm += param_norm.item()**2
+                    total_norm += param_norm**2
 
         # Sum across all model parallel GPUs.
         total_norm_cuda = get_accelerator().FloatTensor([float(total_norm)])
@@ -1333,12 +1333,16 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
         self._model_parallel_all_reduce(tensor=total_norm_cuda, op=dist.ReduceOp.SUM)
 
-        total_norm = total_norm_cuda[0].item()**(1. / norm_type)
+        total_norm = total_norm_cuda[0]**(1. / norm_type)
 
-        if total_norm == float('inf') or total_norm == -float('inf') or total_norm != total_norm:
-            total_norm = -1
+        norm_is_inf = total_norm.isinf()
+        norm_is_nan = total_norm.isnan()
+        inf_or_nan = norm_is_nan.logical_or(norm_is_inf)
 
-        return total_norm
+        err = torch.tensor(-1.0, device=inf_or_nan.device, dtype=torch.float)
+        total_norm = err.where(inf_or_nan, total_norm)
+
+        return total_norm.cpu()
 
     @instrument_w_nvtx
     def partition_grads(self, params_to_release: List[Parameter], grad_partitions: List[Tensor]) -> None:
@@ -1665,7 +1669,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
             # Take max across all GPUs.
             self._model_parallel_all_reduce(tensor=total_norm_cuda, op=dist.ReduceOp.MAX)
-            total_norm = total_norm_cuda[0].item()
+            total_norm = total_norm_cuda[0]
         else:
             # if dist.get_rank() == 0:
             #    logger.info(f"Total Norm beginning {total_norm}")
@@ -1686,10 +1690,14 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
             self._model_parallel_all_reduce(tensor=total_norm_cuda, op=dist.ReduceOp.SUM)
 
-            total_norm = total_norm_cuda.item()**(1. / norm_type)
+            total_norm = total_norm_cuda**(1. / norm_type)
 
-        if total_norm == float('inf') or total_norm == -float('inf') or total_norm != total_norm:
-            total_norm = -1
+        norm_is_inf = total_norm.isinf()
+        norm_is_nan = total_norm.isnan()
+        inf_or_nan = norm_is_nan.logical_or(norm_is_inf)
+
+        err = torch.tensor(-1.0, device=inf_or_nan.device, dtype=torch.float)
+        total_norm = inf_or_nan * err + inf_or_nan.logical_not() * total_norm
 
         return total_norm
 
@@ -1888,6 +1896,10 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # First compute norm for all group so we know if there is overflow
         if self.dtype == torch.float16:
             self.check_overflow()
+        elif self.offload_optimizer:
+            #TODO SW-152743: Remove this WA when SW-152531 is fixed
+            self.check_overflow()
+            self.overflow = False
 
         #loss scaling related computation
         prev_scale = self.loss_scale
@@ -1949,7 +1961,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             return
 
         norm_groups = self._get_norm_groups()
-        scaled_global_grad_norm = get_global_norm(norm_list=norm_groups)
+        scaled_global_grad_norm = torch.norm(torch.stack(norm_groups))
 
         # Stash unscaled gradient norm
         self._global_grad_norm = scaled_global_grad_norm / self.loss_scale
@@ -2061,8 +2073,11 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if partition_gradients:
             with get_accelerator().stream(self.reduce_and_partition_stream):
                 if hasattr(self.inf_or_nan_tracker, "logical_or_"):
-                    self.inf_or_nan_tracker.logical_or_(torch.isinf(self.grad_partitions_flat_buffer).any())
-                    self.inf_or_nan_tracker.logical_or_(torch.isnan(self.grad_partitions_flat_buffer).any())
+                    #[SW-117312] WA for failure when applying any() on empty tensor on HPU.
+                    #TODO: revert when the bug is fixed.
+                    if self.grad_partitions_flat_buffer.numel() > 0:
+                        self.inf_or_nan_tracker.logical_or_(torch.isinf(self.grad_partitions_flat_buffer).any())
+                        self.inf_or_nan_tracker.logical_or_(torch.isnan(self.grad_partitions_flat_buffer).any())
                 else:
                     # logical_or_ not available in older versions of pytorch
                     self.inf_or_nan_tracker += torch.isinf(self.grad_partitions_flat_buffer).any()

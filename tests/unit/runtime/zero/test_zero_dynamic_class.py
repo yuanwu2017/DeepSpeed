@@ -6,7 +6,7 @@
 import torch
 
 from unit.common import DistributedTest
-
+import pytest
 import deepspeed
 
 
@@ -15,7 +15,8 @@ class TestNewClassDeclaredNestingInit(DistributedTest):
 
     def test_new_class_declared_nesting_init(self):
         ds_config = dict(train_batch_size=1, zero_optimization=dict(stage=3))
-
+        if bool(pytest.use_hpu) == True:
+            ds_config['communication_data_type'] = 'bfp16'
         with deepspeed.zero.Init(config_dict_or_path=ds_config):
 
             class MyModel(torch.nn.Module):
@@ -37,6 +38,8 @@ class TestNewClassDeclaredInsideNestingInit(DistributedTest):
 
     def test_new_class_declared_inside_nesting_init(self):
         ds_config = dict(train_batch_size=1, zero_optimization=dict(stage=3))
+        if bool(pytest.use_hpu) == True:
+            ds_config['communication_data_type'] = 'bfp16'
 
         with deepspeed.zero.Init(config_dict_or_path=ds_config):
 

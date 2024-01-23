@@ -8,9 +8,8 @@ from unit.common import DistributedTest
 from unit.simple_model import random_dataloader
 
 import deepspeed
-
+import os
 from deepspeed.runtime.zero.offload_config import DeepSpeedZeroOffloadOptimizerConfig
-
 import torch.nn as nn
 
 
@@ -63,6 +62,11 @@ class TestZeroPartialOffloadConfigSweep(DistributedTest):
                 }
             }
         }
+        if bool(pytest.use_hpu) == True:
+            if os.getenv("REPLACE_FP16", default=None):
+                config_dict["communication_data_type"] = 'bfp16'
+                config_dict["fp16"]["enabled"] = False
+                config_dict["fp32"] = {"enabled": True}
 
         model = NNModel(h_dim, n_layers)
         model, _, _, _ = deepspeed.initialize(model=model, model_parameters=model.parameters(), config=config_dict)

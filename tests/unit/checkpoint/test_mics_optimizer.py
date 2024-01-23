@@ -12,7 +12,7 @@ from deepspeed.runtime.utils import required_torch_version
 from unit.common import DistributedTest
 from unit.simple_model import *
 from unit.checkpoint.common import *
-
+from unit.hpu import *
 import pytest
 
 if not required_torch_version(max_version=2.0):
@@ -46,7 +46,13 @@ class TestMiCSCheckpoint(DistributedTest):
                 "mics_shard_size": shard_size
             }
         }
-
+        if bool(pytest.use_hpu) == True:
+            if os.getenv("REPLACE_FP16", default=None):
+                config_dict["fp16"]["enabled"] = False
+                config_dict["bf16"] = {"enabled": True}
+            hpu_flag, msg = is_hpu_supported(config_dict)
+            if not hpu_flag:
+                pytest.skip(msg)
         hidden_dim = 10
         with deepspeed.zero.MiCS_Init(config_dict_or_path=config_dict):
             models = [SimpleModel(hidden_dim, empty_grad=False) for _ in range(2)]

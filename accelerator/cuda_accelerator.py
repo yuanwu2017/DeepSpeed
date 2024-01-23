@@ -183,11 +183,7 @@ class CUDA_Accelerator(DeepSpeedAccelerator):
         return torch.cuda.is_bf16_supported()
 
     def is_fp16_supported(self):
-        major, _ = torch.cuda.get_device_capability()
-        if major >= 7:
-            return True
-        else:
-            return False
+        return True
 
     def supported_dtypes(self):
         return [torch.float, torch.half, torch.bfloat16]

@@ -126,6 +126,10 @@ BFLOAT16_OLD = "bfloat16"  # keeping for backwards compatibility
 BFLOAT16_ENABLED = "enabled"
 BFLOAT16_ENABLED_DEFAULT = False
 
+# bf16 optimizer gradient accumulation via hooks
+BFLOAT16_GRAD_ACC_VIA_HOOKS = "accumulate_grads_via_hooks"
+BFLOAT16_GRAD_ACC_VIA_HOOKS_DEFAULT = False
+
 #########################################
 # FP16 support
 #########################################
@@ -439,3 +443,11 @@ GLOBAL_RANK = "global_rank"
 #########################################
 USE_DATA_BEFORE_EXPERT_PARALLEL = "use_data_before_expert_parallelism"
 USE_DATA_BEFORE_EXPERT_PARALLEL_DEFAULT = False
+#############################################
+# Allow FP32 for ZeRO1
+#############################################
+# By default, ZeRO does not support FP32 comm data type.
+# The reason is that it has less gain to use FP32 in ZeRO.
+# However, it may be useful for debugging to compare ZeRO to non-ZeRO FP32 runs.
+ZERO_ALLOW_COMM_DATA_TYPE_FP32 = "zero_allow_comm_data_type_fp32"
+ZERO_ALLOW_COMM_DATA_TYPE_FP32_DEFAULT = False

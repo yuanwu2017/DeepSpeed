@@ -70,6 +70,7 @@ class InferenceModel:
         return 16
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_mapping_syntax():
     model = InferenceModel()
@@ -90,6 +91,7 @@ def test_mapping_syntax():
     assert mapping_layer.is_populated == True
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_sub_mapping_syntax():
     model = InferenceModel()
@@ -117,6 +119,7 @@ def test_sub_mapping_syntax():
     assert mapping_layer.is_populated == True
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_double_mapping_syntax():
     model = InferenceModel()
@@ -130,6 +133,7 @@ def test_double_mapping_syntax():
     assert mapping_layer.is_populated == True
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_insufficient_mapping_syntax():
     """
@@ -150,6 +154,7 @@ def test_insufficient_mapping_syntax():
             multi_depend2: MultiDependencyContainer
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_unknown_target_mapping_syntax():
     """

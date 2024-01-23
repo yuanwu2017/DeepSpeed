@@ -34,6 +34,7 @@ class DummyInferenceModel:
         return InferenceParameter.initialize(param)
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_simple_moe_layer():
 
@@ -95,6 +96,7 @@ class MixedInferenceModel:
         return 2
 
 
+@pytest.mark.xfail(bool(pytest.use_hpu) == True, reason="xfail, inference_v2 not supported by HPU. SW-170183")
 @pytest.mark.inference_v2
 def test_mixed_param_lists():
     model = MixedInferenceModel()
