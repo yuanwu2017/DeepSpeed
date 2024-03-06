@@ -323,6 +323,7 @@ def replace_transformer_layer(orig_layer_impl, model, checkpoint_dict, config, m
             module = replace_wo_policy(module, ("embed_out", ), 0, "embed_out")
         return module
 
+    replaced_module = None
     # TODO SW-170491: remove the below WA once SW-170491 is resolved.
     if not llama_large_seq_perf_workaround and checkpoint_dict is not None and not config.replace_with_kernel_inject:
         # AutoTP shard loading
